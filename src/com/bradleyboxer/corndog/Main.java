@@ -4,6 +4,7 @@ import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -16,9 +17,15 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+/**
+ * Main class of the Corndog Crunch game.
+ * @author Bradley Boxer
+ *
+ */
 public class Main extends JFrame {
 	private static final long serialVersionUID = 1L;
     public static AudioClip end = Applet.newAudioClip((URL) Creature.class.getResource("/resources/sound7.wav")); 
+    public static AudioClip error = Applet.newAudioClip((URL) Main.class.getResource("/resources/error.wav"));
 	public static ImageIcon[] cI = {cImg(0), cImg(1), cImg(2), cImg(3), cImg(4), cImg(5), cImg(6), cImg(7), cImg(8)};
 	public static Creature[] creatures = {new Creature(), new Creature(), new Creature(), new Creature(), new Creature(), new Creature(), new Creature(), new Creature(), new Creature()};
 	public static JPanel[] panels = {new JPanel(), new JPanel(), new JPanel(), new JPanel(), new JPanel()};
@@ -26,11 +33,13 @@ public class Main extends JFrame {
 	public static Creature activeCreature;
 	public static Random rand = new Random();
 	public static JButton restart = new JButton();
+	public static JButton scoreboardBtn = new JButton();
 	public static JLabel timerLabel = new JLabel();
 	public static double timerTime = 0;
 	public static int score;
 	public static Main game;
 	public static boolean on;
+	public static Scoreboard scoreboard = new Scoreboard();
 	
 	public Main() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -45,15 +54,18 @@ public class Main extends JFrame {
 		panels[4].setLayout(new GridLayout(3, 3));
 		
 		this.add(panels[3], BorderLayout.NORTH);
-		panels[3].setLayout(new GridLayout(1, 2));
+		panels[3].setLayout(new GridLayout(1, 3));
 		panels[3].add(timerLabel);
 		panels[3].add(restart);
+		panels[3].add(scoreboardBtn);
 		
+		scoreboardBtn.addActionListener(new Clicked());
+		scoreboardBtn.setText("Scoreboard");
 		timerLabel.setText("Time: 0");
 	//	timerLabel.setFont(new Font("Serif", Font.BOLD, 14));
 		timerLabel.setHorizontalAlignment(JLabel.CENTER);
 		
-		restart.setText("Restart Game");
+		restart.setText("Start Game");
 		restart.addActionListener(new Clicked());
 		
 		
@@ -75,8 +87,6 @@ public class Main extends JFrame {
 				addCount++;
 			}
 		}
-		placeNewCreature();
-		startGame();
 	}
 
 	public static void main(String[] args) throws InterruptedException {
@@ -90,12 +100,13 @@ public class Main extends JFrame {
 				timerLabel.setText("Time: " + timeElapsed);
 			
 				if(timeElapsed.equals("8.00")) { 
-					end.play();
+					//end.play();
 					if(JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0) {
 						stop();
 						on = true;
 					} else {
-						System.exit(0); //no 
+						activeCreature.remove();
+						on = false;
 					} 
 				}
 			}
@@ -105,8 +116,9 @@ public class Main extends JFrame {
 		
 	}
 
-	public static void startGame() {
+	public static void start() {
 		if(JOptionPane.showConfirmDialog(game, "Ready?", "Let's play Corndog Crunch!", JOptionPane.YES_NO_OPTION) == 0) {
+			placeNewCreature();
 			on = true;
 		} else {
 		  System.exit(0); //no 
@@ -133,10 +145,17 @@ public class Main extends JFrame {
 				placeNewCreature();
 				score++;
 			}
-			if(e.getSource()==restart) {
-				end.play();
+			else if(e.getSource()==restart) {
+				//end.play();
 				stop();
-				startGame();
+				start();
+			}
+			else if(e.getSource()==scoreboardBtn) {
+				if(!on) {
+					stop();
+					scoreboard.setVisible(true);
+				}
+				else {error.stop(); error.play();}
 			}
 		}
 	}
