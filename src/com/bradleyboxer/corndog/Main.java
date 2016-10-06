@@ -3,8 +3,6 @@ package com.bradleyboxer.corndog;
 import java.applet.Applet;
 import java.applet.AudioClip;
 import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.Frame;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -109,7 +107,7 @@ public class Main extends JFrame {
 					
 					if(score>lowestBestScore) {
 						String playerName = (String) JOptionPane.showInputDialog(game, "Enter your name for input into the scoreboard!", "Your score is " + String.valueOf(score), JOptionPane.PLAIN_MESSAGE, null, null, "Bobby Teenager");
-						scoreboard.addScore(playerName, score);
+						if(playerName!=null) {scoreboard.addScore(playerName, score);}
 						scoreboard.repopulate();
 						playAgain();
 					} else {
