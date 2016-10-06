@@ -41,7 +41,8 @@ public class Main extends JFrame {
 	public static int score;
 	public static Main game;
 	public static boolean on;
-	public static boolean firstRun = true;
+	public static boolean firstRun;
+	public static int lowestBestScore = 0;
 	public static Scoreboard scoreboard = new Scoreboard();
 
 	
@@ -53,6 +54,8 @@ public class Main extends JFrame {
 		this.setLocationRelativeTo(null);
 		this.setVisible(true);
 		this.setLayout(new BorderLayout());
+		
+		firstRun = true;
 		
 		this.add(panels[4], BorderLayout.CENTER);
 		panels[4].setLayout(new GridLayout(3, 3));
@@ -102,19 +105,31 @@ public class Main extends JFrame {
 				timerLabel.setText("Time: " + timeElapsed);
 			
 				if(timeElapsed.equals("8.00")) { 
-					//end.play();
-					if(JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0) {
-						stop(true);
-						start(false);
+					end.play();
+					
+					if(score>lowestBestScore) {
+						String playerName = (String) JOptionPane.showInputDialog(game, "Enter your name for input into the scoreboard!", "Your score is " + String.valueOf(score), JOptionPane.PLAIN_MESSAGE, null, null, "Bobby Teenager");
+						scoreboard.addScore(playerName, score);
+						scoreboard.repopulate();
+						playAgain();
 					} else {
-						stop(true);
-					} 
+						playAgain();
+					}
 				}
 			}
 			else {}
 			Thread.sleep(10);
 		}
 		
+	}
+	
+	public static void playAgain() {
+		if(JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0) {
+			stop(true);
+			start(false);
+		} else {
+			stop(true);
+		} 
 	}
 	
 	/**
@@ -144,7 +159,7 @@ public class Main extends JFrame {
 		timerTime = 0;
 		timerLabel.setText("Time: 0");
 		score = 0;
-		if(removeCurrentCreature) {activeCreature.remove();}
+		if((removeCurrentCreature) && (activeCreature!=null)) {activeCreature.remove();}
 	}
 	
 	/**
@@ -164,7 +179,6 @@ public class Main extends JFrame {
 				score++;
 			}
 			else if(e.getSource()==startGame) {
-				//end.play();
 				stop(!firstRun);
 				firstRun = false;
 				start(true);
@@ -178,7 +192,7 @@ public class Main extends JFrame {
 			}
 		}
 	}
-
+	
 	private static ImageIcon cImg(int resourceNumber) {
 		return (new ImageIcon(Main.class.getResource("/resources/c" + String.valueOf(resourceNumber) + ".png")));
 	}

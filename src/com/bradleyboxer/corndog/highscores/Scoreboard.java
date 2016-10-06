@@ -2,6 +2,9 @@ package com.bradleyboxer.corndog.highscores;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+
+import com.bradleyboxer.corndog.Main;
+
 import java.util.*;
 import java.awt.GridLayout;
 import java.io.*;
@@ -27,10 +30,20 @@ public class Scoreboard extends JFrame{
 		this.setSize(300, 300);
 		this.setVisible(false);
 		this.setAlwaysOnTop(true);
-		this.setTitle("Corndog Crunch - Scoreboard");
+		this.setTitle("C.C. - Scoreboard");
 		this.setLocationRelativeTo(null);
 		
 		populate2();
+		Main.lowestBestScore = scores.get(9).getScore();
+	}
+	
+	public void repopulate() {
+		for(int i=0;i<10;i++) {
+			scores = getScores(); //filling the scores-arraylist
+			scoreLabels[i].setText(String.valueOf(i+1) + ".     " + scores.get(i).getName());
+			scoreData[i].setText(String.valueOf(scores.get(i).getScore()));
+			Main.lowestBestScore = scores.get(9).getScore();
+		}
 	}
 	
 	public void populate2() {
@@ -92,7 +105,7 @@ public class Scoreboard extends JFrame{
                     outputStream.close();
                 }
             } catch (IOException e) {
-                System.out.println("[Laad] IO Error: " + e.getMessage());
+                System.out.println("IO Error: " + e.getMessage());
             }
         }
 	}
