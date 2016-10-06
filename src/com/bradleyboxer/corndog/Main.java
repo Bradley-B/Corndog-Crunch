@@ -17,6 +17,8 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
+import com.bradleyboxer.corndog.highscores.Scoreboard;
+
 /**
  * Main class of the Corndog Crunch game.
  * @author Bradley Boxer
@@ -62,12 +64,10 @@ public class Main extends JFrame {
 		scoreboardBtn.addActionListener(new Clicked());
 		scoreboardBtn.setText("Scoreboard");
 		timerLabel.setText("Time: 0");
-	//	timerLabel.setFont(new Font("Serif", Font.BOLD, 14));
 		timerLabel.setHorizontalAlignment(JLabel.CENTER);
 		
 		restart.setText("Start Game");
 		restart.addActionListener(new Clicked());
-		
 		
 		for(int i=0;i<3;i++) {
 			panels[4].add(panels[i]);
@@ -102,11 +102,10 @@ public class Main extends JFrame {
 				if(timeElapsed.equals("8.00")) { 
 					//end.play();
 					if(JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0) {
-						stop();
-						on = true;
+						stop(true);
+						start(false);
 					} else {
-						activeCreature.remove();
-						on = false;
+						stop(true);
 					} 
 				}
 			}
@@ -115,23 +114,40 @@ public class Main extends JFrame {
 		}
 		
 	}
-
-	public static void start() {
-		if(JOptionPane.showConfirmDialog(game, "Ready?", "Let's play Corndog Crunch!", JOptionPane.YES_NO_OPTION) == 0) {
+	
+	/**
+	 * starts the program with optionally showing a dialog window
+	 */
+	public static void start(boolean showDialogWindow) {
+		if(showDialogWindow) {
+			if(JOptionPane.showConfirmDialog(game, "Ready?", "Let's play Corndog Crunch!", JOptionPane.YES_NO_OPTION) == 0) {
+				placeNewCreature();
+				on = true;
+			} else {
+			  System.exit(0); //no 
+			}
+		}
+		else {
+			stop(false);
 			placeNewCreature();
 			on = true;
-		} else {
-		  System.exit(0); //no 
-		} 
+		}
 	}
 	
-	public static void stop() {
+	/**
+	 * stops the program with optionally removing the current creature
+	 */
+	public static void stop(boolean removeCurrentCreature) {
 		on = false;
 		timerTime = 0;
 		timerLabel.setText("Time: 0");
 		score = 0;
+		if(removeCurrentCreature) {activeCreature.remove();}
 	}
 	
+	/**
+	 * places a new creature
+	 */
 	public static void placeNewCreature() {
 		activeCreature = creatures[rand.nextInt(9)];
 		activeCreature.setIcon(cI[rand.nextInt(9)]);
@@ -147,12 +163,12 @@ public class Main extends JFrame {
 			}
 			else if(e.getSource()==restart) {
 				//end.play();
-				stop();
-				start();
+				stop(false);
+				start(true);
 			}
 			else if(e.getSource()==scoreboardBtn) {
 				if(!on) {
-					stop();
+					stop(false);
 					scoreboard.setVisible(true);
 				}
 				else {error.stop(); error.play();}
