@@ -24,7 +24,7 @@ import com.bradleyboxer.corndog.highscores.Scoreboard;
  * @author Bradley Boxer
  *
  */
-public class Main extends JFrame {
+public class Main extends JFrame { 
 	private static final long serialVersionUID = 1L;
     public static AudioClip end = Applet.newAudioClip((URL) Creature.class.getResource("/resources/sound7.wav")); 
     public static AudioClip error = Applet.newAudioClip((URL) Main.class.getResource("/resources/error.wav"));
@@ -34,14 +34,16 @@ public class Main extends JFrame {
 	//panel 0-1-2 contain game buttons. Panel 3 is a label panel. Panel 4 contains panels 0-1-2. 
 	public static Creature activeCreature;
 	public static Random rand = new Random();
-	public static JButton restart = new JButton();
+	public static JButton startGame = new JButton();
 	public static JButton scoreboardBtn = new JButton();
 	public static JLabel timerLabel = new JLabel();
 	public static double timerTime = 0;
 	public static int score;
 	public static Main game;
 	public static boolean on;
+	public static boolean firstRun = true;
 	public static Scoreboard scoreboard = new Scoreboard();
+
 	
 	public Main() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -58,7 +60,7 @@ public class Main extends JFrame {
 		this.add(panels[3], BorderLayout.NORTH);
 		panels[3].setLayout(new GridLayout(1, 3));
 		panels[3].add(timerLabel);
-		panels[3].add(restart);
+		panels[3].add(startGame);
 		panels[3].add(scoreboardBtn);
 		
 		scoreboardBtn.addActionListener(new Clicked());
@@ -66,8 +68,8 @@ public class Main extends JFrame {
 		timerLabel.setText("Time: 0");
 		timerLabel.setHorizontalAlignment(JLabel.CENTER);
 		
-		restart.setText("Start Game");
-		restart.addActionListener(new Clicked());
+		startGame.setText("Start Game");
+		startGame.addActionListener(new Clicked());
 		
 		for(int i=0;i<3;i++) {
 			panels[4].add(panels[i]);
@@ -161,9 +163,10 @@ public class Main extends JFrame {
 				placeNewCreature();
 				score++;
 			}
-			else if(e.getSource()==restart) {
+			else if(e.getSource()==startGame) {
 				//end.play();
-				stop(false);
+				stop(!firstRun);
+				firstRun = false;
 				start(true);
 			}
 			else if(e.getSource()==scoreboardBtn) {
