@@ -99,10 +99,10 @@ public class Main extends JFrame {
 		
 			if(on) {
 				timerTime = timerTime + 0.01;
-				String timeElapsed = String.format("%.2f", timerTime);
+				String timeElapsed = String.valueOf(String.format("%.2f", (8-timerTime))); 
 				timerLabel.setText("Time: " + timeElapsed);
 			
-				if(timeElapsed.equals("8.00")) { 
+				if(timeElapsed.equals("0.00")) { 
 					end.play();
 					
 					if(score>lowestBestScore) {
@@ -122,7 +122,7 @@ public class Main extends JFrame {
 	}
 	
 	public static void playAgain() {
-		if(JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0) {
+		if(JOptionPane.showConfirmDialog(game, ("Play again? Your score is " + score + "."), "Play Again?", JOptionPane.YES_NO_OPTION) == 0) {
 			stop(true);
 			start(false);
 		} else {
@@ -135,7 +135,7 @@ public class Main extends JFrame {
 	 */
 	public static void start(boolean showDialogWindow) {
 		if(showDialogWindow) {
-			if(JOptionPane.showConfirmDialog(game, "Ready?", "Let's play Corndog Crunch!", JOptionPane.YES_NO_OPTION) == 0) {
+			if(JOptionPane.showConfirmDialog(game, "Ready? You have 8 seconds.", "Let's play Corndog Crunch!", JOptionPane.YES_NO_OPTION) == 0) {
 				placeNewCreature();
 				on = true;
 			} else {
@@ -172,9 +172,9 @@ public class Main extends JFrame {
 	private class Clicked implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==activeCreature) {
+				score++;
 				activeCreature.kill();
 				placeNewCreature();
-				score++;
 			}
 			else if(e.getSource()==startGame) {
 				stop(!firstRun);
