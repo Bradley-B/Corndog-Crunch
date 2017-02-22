@@ -23,6 +23,7 @@ public class Scoreboard extends JFrame{
     private static final String HIGHSCORE_FILE = "scores.dat";  // The name of the file where the highscores will be saved
     ObjectOutputStream outputStream = null;  //Initialising an in and outputStream for working with the file
     ObjectInputStream inputStream = null;
+    int lowestBestScore = 0;
     
 	public Scoreboard() {
 		this.setLayout(new GridLayout(10, 2));
@@ -30,20 +31,21 @@ public class Scoreboard extends JFrame{
 		this.setSize(300, 300);
 		this.setVisible(false);
 		this.setAlwaysOnTop(true);
-		this.setTitle("C.C. - Scoreboard");
+		this.setTitle("Scoreboard");
 		this.setLocationRelativeTo(null);
 		
 		populate2();
 		Main.lowestBestScore = scores.get(9).getScore();
 	}
 	
-	public void repopulate() {
+	public int repopulate() {
 		for(int i=0;i<10;i++) {
 			scores = getScores(); //filling the scores-arraylist
 			scoreLabels[i].setText(String.valueOf(i+1) + ".     " + scores.get(i).getName());
 			scoreData[i].setText(String.valueOf(scores.get(i).getScore()));
-			Main.lowestBestScore = scores.get(9).getScore();
+			lowestBestScore = scores.get(9).getScore();
 		}
+		return lowestBestScore;
 	}
 	
 	public void populate2() {
