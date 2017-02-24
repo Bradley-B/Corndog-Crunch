@@ -34,13 +34,16 @@ public class MultiplayerListener extends Thread{
 			Main.placeNewCreature();
 			MultiplayerWindow.setMultiplayerGame(true);
 			MultiplayerWindow.setUnready();
+		} else if(command.contains("MP_SCORE_REPORT")) {
+			//System.out.println(command.substring(15,command.length()).trim());
+			MultiplayerWindow.console.setText(command.substring(15,command.length()).trim());
 		} else {
-			textProgress++;
-			if(textProgress>10 || textProgress==0) {
+			if(textProgress>=10) {
 				MultiplayerWindow.console.setText(command);
 				textProgress = 0;
 			} else {
 				MultiplayerWindow.console.setText(MultiplayerWindow.console.getText()+"\n"+command);
+				textProgress++;
 			}
 		}
 	}

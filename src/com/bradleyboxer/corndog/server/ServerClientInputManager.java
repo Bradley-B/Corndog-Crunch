@@ -18,12 +18,13 @@ public class ServerClientInputManager extends Thread{
 		} catch (IOException e) {
 			e.printStackTrace();
 			System.out.println("IO exception in ServerClientManager thread creating bufferedreader");
-		}
+		} 
 	}
 	
 	public ServerClientManager findMaster() {
+		
 		for(ServerClientManager cm : Server.sa.getClients()) {
-			if(socket.equals(cm.socket)) {
+			if(socket.getRemoteSocketAddress().toString().equals(cm.socket.getRemoteSocketAddress().toString())) {
 				return cm;
 			}
 		}
@@ -35,8 +36,10 @@ public class ServerClientInputManager extends Thread{
 		
 		if(command.compareTo("ready")==0) {
 			cm.setReady();
+			Server.sc.sendMessageToClients(cm.name+" readied!");
 		} else if(command.compareTo("unready")==0) {
 			cm.setUnready();
+			Server.sc.sendMessageToClients(cm.name+" unreadied!");
 		} else if(command.contains("SCORE_REPORT")) {
 			String sscore = command.substring(12, 15);
 			cm.setScore(Integer.valueOf(sscore.trim()));
@@ -51,7 +54,7 @@ public class ServerClientInputManager extends Thread{
 		try {
 			while(!socket.isClosed()) {
 				
-				input = in.readLine(); //thread should hang on this line until new line is found on stream
+				input = in.readLine(); //thread hangs on this line until new line is found on stream
 				
 				System.out.println("Command recieved from " + socket.getInetAddress() + " : " + input);
 	

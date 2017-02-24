@@ -1,13 +1,14 @@
 package com.bradleyboxer.corndog.server;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 
-import com.bradleyboxer.corndog.highscores.MultiplayerHighscores;
+import com.bradleyboxer.corndog.highscores.Score;
+import com.bradleyboxer.corndog.highscores.ScoreComparator;
 
 public class ServerController extends Thread {
 
-	public ArrayList<MultiplayerHighscores> highscores = new ArrayList<MultiplayerHighscores>();
+	public ArrayList<Score> scores = new ArrayList<Score>();
 	public boolean gameRunning = false;
 	public int timeRemaining = 10;
 	
@@ -35,6 +36,16 @@ public class ServerController extends Thread {
 				Thread.sleep(9000);
 				gameRunning = false;
 				timeRemaining = 10;
+				collectScoresFromClients();
+				
+				String finalScoreString = "MP_SCORE_REPORT ";
+				for(Score s : scores) {
+					finalScoreString = finalScoreString+s.getName()+": "+s.getScore()+"\n";
+				}
+				
+				System.out.println("Scores counted! Results: \n"+finalScoreString);
+				sendMessageToClients(finalScoreString);
+				scores.clear();
 				
 			} else {
 				timeRemaining--;
@@ -46,12 +57,15 @@ public class ServerController extends Thread {
 		
 	}
 	
-/*	public void collectScoresFromClients() {
+	public void collectScoresFromClients() {
+		ScoreComparator comparator = new ScoreComparator();
+
 		for(ServerClientManager cm : Server.sa.getClients()) {
-			
+			scores.add(cm.getScore());
+			Collections.sort(scores, comparator);
 		}
 	}
-*/
+
 	
 	public boolean getAllReady() {
 		ArrayList<ServerClientManager> clients = Server.sa.getClients();
@@ -69,19 +83,6 @@ public class ServerController extends Thread {
 		
 		try {Thread.sleep(500);} catch (InterruptedException e) {}
 		return true;
-	}
-	
-	public void sendObjectToClients(Object obj) {
-		for(ServerClientManager cm : Server.sa.getClients()) {
-			try {
-				cm.objOut.writeObject(obj);
-				cm.objOut.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-				System.out.println("Error in writing object to clients");
-			}
-			
-		}
 	}
 	
 	public void sendMessageToClients(String message) {

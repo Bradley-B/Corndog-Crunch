@@ -1,9 +1,10 @@
 package com.bradleyboxer.corndog.server;
 
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
+
+import com.bradleyboxer.corndog.highscores.Score;
 
 class ServerClientManager extends Thread{  
 
@@ -11,25 +12,18 @@ class ServerClientManager extends Thread{
 	String threadName = null;
 	PrintWriter out = null;
 	Socket socket = null;
-	ObjectOutputStream objOut = null;
 	ServerClientInputManager cim = null;
-	String name;
-	int score;
+	String name = "default.name";
+	int score = 0;
 	
 	public ServerClientManager(Socket socket){
-		this.socket=socket;
-		cim = new ServerClientInputManager(socket);
-		cim.start();
-		
-		try{
-			out = new PrintWriter(socket.getOutputStream());
-			objOut = new ObjectOutputStream(socket.getOutputStream());
-		}catch(IOException e){
-			e.printStackTrace();
-			System.out.println("IO exception in ServerClientManager thread creating output stream");
-		}
+		this.socket = socket;
 	}
 
+	public Score getScore() {
+		return new Score(name, score);
+	}
+	
 	public void setScore(int score) {
 		this.score = score;
 	}
@@ -73,10 +67,6 @@ class ServerClientManager extends Thread{
 				out.close();
 				System.out.println("Socket output closed");
 			}	
-			if(objOut!=null) {
-				objOut.close();
-				System.out.println("Socket object output closed");
-			}	
 			if (socket!=null){
 				socket.close();
 				System.out.println("Socket closed");
@@ -89,7 +79,15 @@ class ServerClientManager extends Thread{
 	}
 	
 	public void run() {
+		cim = new ServerClientInputManager(socket);
+		cim.start();
 		
+		try{
+			out = new PrintWriter(socket.getOutputStream());	
+		}catch(IOException e){
+			e.printStackTrace();
+			System.out.println("IO exception in ServerClientManager thread creating output stream");
+		}
 	}
 	
 }//end class

@@ -172,6 +172,7 @@ public class MultiplayerWindow extends JFrame {
 				if(validatePort(uPort) && validateIP(uIp) && uName.length()>0) {
 					try {
 						connectToServer(uIp, uName, Integer.decode(uPort));
+						connectBtn.setEnabled(false);
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
