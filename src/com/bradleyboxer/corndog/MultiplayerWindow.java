@@ -176,7 +176,7 @@ public class MultiplayerWindow extends JFrame {
 						ex.printStackTrace();
 					}
 				} else {
-					System.out.println("IP MUST BE IN 0.0.0.0 FORMAT, AND PORT MUST BE AN INTEGER BETWEEN 0-65535");
+					System.out.println("Preference values are incorrect. Please correct any errors and try again.");
 				}
 				
 			} else if(e.getSource()==readyBtn) {

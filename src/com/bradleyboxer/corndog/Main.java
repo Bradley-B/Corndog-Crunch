@@ -175,10 +175,12 @@ public class Main extends JFrame {
 		timerTime = 0;
 		timerLabel.setText("Time: 0");
 		
-		if(!MultiplayerWindow.socket1.isClosed()) {
-			MultiplayerWindow.setMultiplayerGame(false);
-			MultiplayerWindow.sendMessageToServer("SCORE_REPORT "+score+"  ");
-		}
+		try {
+			if(!MultiplayerWindow.socket1.isClosed()) {
+				MultiplayerWindow.setMultiplayerGame(false);
+				MultiplayerWindow.sendMessageToServer("SCORE_REPORT "+score+"  ");
+			}
+		} catch(NullPointerException e) {}
 		
 		score = 0;
 		

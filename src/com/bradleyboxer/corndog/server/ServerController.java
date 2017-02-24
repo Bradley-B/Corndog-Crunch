@@ -2,8 +2,6 @@ package com.bradleyboxer.corndog.server;
 
 import java.util.ArrayList;
 
-import com.bradleyboxer.corndog.highscores.Score;
-
 public class ServerController extends Thread {
 
 	public boolean gameRunning = false;
@@ -17,6 +15,8 @@ public class ServerController extends Thread {
 				if(readyToStart) {
 					runCountdown();
 				}
+			} else {
+				try{Thread.sleep(250);} catch(InterruptedException e) {}
 			}
 		}
 	}
@@ -60,6 +60,7 @@ public class ServerController extends Thread {
 				return false;
 			}
 		}
+		
 		
 		try {Thread.sleep(500);} catch (InterruptedException e) {}
 		return true;

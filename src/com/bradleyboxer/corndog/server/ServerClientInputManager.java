@@ -57,6 +57,7 @@ public class ServerClientInputManager extends Thread{
 	
 				processCommand(input);
 				
+				try{Thread.sleep(1);} catch(InterruptedException e) {}
 			}
 		} catch(IOException e) {
 			System.out.println("error in reading CIM... closing respective socket");

@@ -32,10 +32,14 @@ public class ServerAcceptor extends Thread{
 		while(!serverSocket.isClosed()){
 			try{
 				socket = serverSocket.accept();
+				
 				System.out.println("Connection established with " + socket.getRemoteSocketAddress() + " . Opening in new thread.");
 				ServerClientManager connectionToClient = new ServerClientManager(socket);
 				threads.add(connectionToClient);
 				connectionToClient.start();
+				
+				try{Thread.sleep(1);} catch(InterruptedException e) {}
+				
 			} catch(Exception e){
 				e.printStackTrace();
 				System.out.println("Connection Error");
