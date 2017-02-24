@@ -1,9 +1,13 @@
 package com.bradleyboxer.corndog.server;
 
+import java.io.IOException;
 import java.util.ArrayList;
+
+import com.bradleyboxer.corndog.highscores.MultiplayerHighscores;
 
 public class ServerController extends Thread {
 
+	public ArrayList<MultiplayerHighscores> highscores = new ArrayList<MultiplayerHighscores>();
 	public boolean gameRunning = false;
 	public int timeRemaining = 10;
 	
@@ -42,11 +46,12 @@ public class ServerController extends Thread {
 		
 	}
 	
-	public void collectScoresFromClients() {
+/*	public void collectScoresFromClients() {
 		for(ServerClientManager cm : Server.sa.getClients()) {
 			
 		}
 	}
+*/
 	
 	public boolean getAllReady() {
 		ArrayList<ServerClientManager> clients = Server.sa.getClients();
@@ -64,6 +69,19 @@ public class ServerController extends Thread {
 		
 		try {Thread.sleep(500);} catch (InterruptedException e) {}
 		return true;
+	}
+	
+	public void sendObjectToClients(Object obj) {
+		for(ServerClientManager cm : Server.sa.getClients()) {
+			try {
+				cm.objOut.writeObject(obj);
+				cm.objOut.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+				System.out.println("Error in writing object to clients");
+			}
+			
+		}
 	}
 	
 	public void sendMessageToClients(String message) {

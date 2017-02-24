@@ -1,6 +1,7 @@
 package com.bradleyboxer.corndog.server;
 
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 
@@ -10,6 +11,7 @@ class ServerClientManager extends Thread{
 	String threadName = null;
 	PrintWriter out = null;
 	Socket socket = null;
+	ObjectOutputStream objOut = null;
 	ServerClientInputManager cim = null;
 	String name;
 	int score;
@@ -21,9 +23,10 @@ class ServerClientManager extends Thread{
 		
 		try{
 			out = new PrintWriter(socket.getOutputStream());
+			objOut = new ObjectOutputStream(socket.getOutputStream());
 		}catch(IOException e){
 			e.printStackTrace();
-			System.out.println("IO exception in ServerClientManager thread creating printwriter");
+			System.out.println("IO exception in ServerClientManager thread creating output stream");
 		}
 	}
 
@@ -61,15 +64,19 @@ class ServerClientManager extends Thread{
 	public void closeConnection() {
 		try{
 			System.out.println("Connection closing...");
+			
 			if (cim.in!=null){
 				cim.in.close(); 
 				System.out.println("Socket input stream closed");
 			}
-
 			if(out!=null){
 				out.close();
 				System.out.println("Socket output closed");
-			}
+			}	
+			if(objOut!=null) {
+				objOut.close();
+				System.out.println("Socket object output closed");
+			}	
 			if (socket!=null){
 				socket.close();
 				System.out.println("Socket closed");

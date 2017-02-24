@@ -11,10 +11,10 @@ import java.io.*;
 
 /**
  * Displays and updates a scoreboard read from a file. Uses example code from http://forum.codecall.net/topic/50071-making-a-simple-high-score-system/.
- * @author Bradley Boxer
+ * 
  *
  */
-public class Scoreboard extends JFrame{
+public class Scoreboard extends JFrame implements Serializable{
 	
 	private static JLabel[] scoreData = {new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel()};
 	private static JLabel[] scoreLabels = {new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel(), new JLabel()};
