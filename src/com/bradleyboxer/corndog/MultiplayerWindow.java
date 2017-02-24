@@ -16,27 +16,35 @@ import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
 
-public class MultiplayerWindow extends JFrame{
+public class MultiplayerWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	public static JPanel[] connectPanels = {new JPanel(), new JPanel(), new JPanel()};
+	public static JPanel[] connectPanels = {new JPanel(), new JPanel(), new JPanel(), new JPanel(), new JPanel()};
 	public static JButton connectBtn = new JButton();
 	public static JTextField ipInput = new JTextField();
 	public static JTextField portInput = new JTextField();	
 	public static JLabel connectLbl = new JLabel();
 	public static InetAddress address;
 	public static Socket socket1=null;
-	public static String line=null;
 	public static BufferedReader br=null;
-	public static BufferedReader in=null;
 	public static PrintWriter out=null;
-
+	public static MultiplayerListener listener = null;
+	public static boolean on = false;
+	public static JTextArea console = new JTextArea();
+	public static JScrollPane scroll = new JScrollPane(console);
+	public static JButton readyBtn = new JButton();
+	public static JButton unreadyBtn = new JButton();
+	public static JLabel nameLbl = new JLabel();
+	public static JTextField nameInput = new JTextField();
+	
 	public MultiplayerWindow() {
 		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		this.setTitle("Multiplayer");
-		this.setSize(300, 300);
+		this.setSize(300, 415);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(false);
@@ -49,24 +57,46 @@ public class MultiplayerWindow extends JFrame{
 
 		ipInput.setPreferredSize(new Dimension(150, 25));
 		portInput.setPreferredSize(new Dimension(60, 25));
+		nameInput.setPreferredSize(new Dimension(90, 25));
+		console.setPreferredSize(new Dimension(250, 200));
 		
+		nameInput.setToolTipText("Your Name");
 		ipInput.setToolTipText("IP Address of Server");
 		portInput.setToolTipText("Port of Server");
 		
-		ipInput.setText("0.0.0.0");
-		portInput.setText("4579");
+		nameLbl.setText("Name: ");
+		ipInput.setText("");
+		portInput.setText("4445");
+		readyBtn.setText("Ready");
+		unreadyBtn.setText("Not Ready");
+		
+		readyBtn.setEnabled(false);
+		unreadyBtn.setEnabled(false);
 		
 		this.add(connectPanels[0]);
 		this.add(connectPanels[1]);
 		this.add(connectPanels[2]);	
+		this.add(connectPanels[3]);
+		this.add(connectPanels[4]);
+		
 		connectPanels[0].add(connectLbl);
 		connectPanels[1].add(ipInput);
 		connectPanels[1].add(portInput);
+		connectPanels[2].add(nameLbl);
+		connectPanels[2].add(nameInput);
 		connectPanels[2].add(connectBtn);
+		connectPanels[3].add(readyBtn);
+		connectPanels[3].add(unreadyBtn);
+		connectPanels[4].add(console);
+		connectPanels[4].add(scroll);
 		
-		connectLbl.setText("Enter IP and port of server");
+		console.setEditable(false);
+		
+		connectLbl.setText("Enter IP and Port of Server");
 		connectBtn.setText("Connect");
 		
+		readyBtn.addActionListener(new Clicked());
+		unreadyBtn.addActionListener(new Clicked());
 		connectBtn.addActionListener(new Clicked());
 	}
 	
@@ -87,14 +117,22 @@ public class MultiplayerWindow extends JFrame{
 		return false;
 	}
 	
-	public static void connectToServer(String ip, int port) throws IOException {
+	public static void connectToServer(String ip, String name, int port) throws IOException {
 		address=InetAddress.getLocalHost();
-
+		
 		try {
 			socket1=new Socket(address, port); 
 			br= new BufferedReader(new InputStreamReader(System.in));
-			in=new BufferedReader(new InputStreamReader(socket1.getInputStream()));
+			
 			out= new PrintWriter(socket1.getOutputStream());
+			
+			listener = new MultiplayerListener(socket1);
+			listener.start();
+			
+			readyBtn.setEnabled(true);
+			
+			sendMessageToServer("NAME_REPORT "+name);
+			
 			System.out.println("Connected. Client address : "+address);
 		}
 		catch (IOException e){
@@ -105,15 +143,35 @@ public class MultiplayerWindow extends JFrame{
 
 	}
 
+	public static void sendMessageToServer(String message) {
+		out.println(message);
+		out.flush();
+	}
+	
+	public static void setUnready() {
+		readyBtn.setEnabled(true);
+		unreadyBtn.setEnabled(false);
+		sendMessageToServer("unready");
+	}
+	
+	/**
+	 * turns the game on or off
+	 * @param state the new state of the game
+	 */
+	public static void setMultiplayerGame(boolean state) {
+		on = state;
+	}
+	
 	private class Clicked implements ActionListener {
 		public void actionPerformed(ActionEvent e) {
 			if(e.getSource()==connectBtn) {
 				String uIp = ipInput.getText();
 				String uPort = portInput.getText();
+				String uName = nameInput.getText();
 				
-				if(validatePort(uPort) && validateIP(uIp)) {
+				if(validatePort(uPort) && validateIP(uIp) && uName.length()>0) {
 					try {
-						connectToServer(uIp, Integer.decode(uPort));
+						connectToServer(uIp, uName, Integer.decode(uPort));
 					} catch (IOException ex) {
 						ex.printStackTrace();
 					}
@@ -121,6 +179,12 @@ public class MultiplayerWindow extends JFrame{
 					System.out.println("IP MUST BE IN 0.0.0.0 FORMAT, AND PORT MUST BE AN INTEGER BETWEEN 0-65535");
 				}
 				
+			} else if(e.getSource()==readyBtn) {
+				readyBtn.setEnabled(false);
+				unreadyBtn.setEnabled(true);
+				sendMessageToServer("ready");
+			}else if(e.getSource()==unreadyBtn) {
+				setUnready();
 			}
 		}
 	}

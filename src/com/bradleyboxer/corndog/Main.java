@@ -15,9 +15,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.Timer;
-import javax.swing.WindowConstants;
-
 import com.bradleyboxer.corndog.highscores.Scoreboard;
 
 /**
@@ -108,10 +105,19 @@ public class Main extends JFrame {
 		while(true) { //main loop
 			if(on) {
 				singlePlayer();
+			} else if(MultiplayerWindow.on) {
+				multiplayer();
 			}
 			Thread.sleep(10);
 		}
 		
+	}
+	
+	public static void multiplayer() {
+		if(tick()) {
+			end.play();
+			stop();
+		}
 	}
 	
 	public static void singlePlayer() {
@@ -137,10 +143,6 @@ public class Main extends JFrame {
 	public static void playAgain() {
 		boolean playAgain = (JOptionPane.showConfirmDialog(game, ("Your score is " + score), "Play again?", JOptionPane.YES_NO_OPTION) == 0);
 		stop();
-		
-		if(activeCreature!=null) {
-			activeCreature.remove();
-		}
 		
 		if(playAgain) {
 			start();
@@ -172,8 +174,18 @@ public class Main extends JFrame {
 		on = false;
 		timerTime = 0;
 		timerLabel.setText("Time: 0");
+		
+		if(!MultiplayerWindow.socket1.isClosed()) {
+			MultiplayerWindow.setMultiplayerGame(false);
+			MultiplayerWindow.sendMessageToServer("SCORE_REPORT "+score+"  ");
+		}
+		
 		score = 0;
-			 
+		
+		if(activeCreature!=null) {
+			activeCreature.remove();
+		}
+		
 	}
 	
 	/**
