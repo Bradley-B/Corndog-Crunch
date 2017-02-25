@@ -45,6 +45,7 @@ public class Main extends JFrame {
 	public static Scoreboard scoreboard = new Scoreboard();
 	public static MultiplayerWindow multiplayerWindow = new MultiplayerWindow();
 	public static String[] names = new String[] {"Bobby Teenager", "Dean Kamen", "Owen Busler", "Dank Memer", "Harambe", "Lauren Dahl", "Sarah Nasson"};
+	public static long initialTime = 0;
 	
 	public Main() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -133,11 +134,13 @@ public class Main extends JFrame {
 	}
 	
 	public static boolean tick() {
-		timerTime = timerTime + 0.01;
-		String timeElapsed = String.format("%.2f", timerTime);
-		timerLabel.setText("Time: " + timeElapsed);
 		
-		return timeElapsed.equals("8.00");
+		long sysTime = System.currentTimeMillis()-initialTime;
+		String sysTimeS = String.valueOf(sysTime/1000);
+		
+		timerLabel.setText("Time: " + sysTimeS);
+		
+		return sysTimeS.equals("8");
 	}
 	
 	public static void playAgain() {
@@ -162,6 +165,7 @@ public class Main extends JFrame {
 			return false;
 		} 
 		
+		initialTime = System.currentTimeMillis();
 		placeNewCreature();
 		on = true;
 		return true;
