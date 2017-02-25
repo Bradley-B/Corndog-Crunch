@@ -118,7 +118,7 @@ public class MultiplayerWindow extends JFrame {
 	}
 	
 	public static void connectToServer(String ip, String name, int port) throws IOException {
-		address=InetAddress.getLocalHost();
+		address=InetAddress.getByName(ip);
 		
 		try {
 			socket1=new Socket(address, port); 
