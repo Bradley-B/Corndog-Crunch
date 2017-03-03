@@ -4,6 +4,8 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -23,7 +25,7 @@ import javax.swing.WindowConstants;
 
 public class MultiplayerWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
-	public static JPanel[] connectPanels = {new JPanel(), new JPanel(), new JPanel(), new JPanel(), new JPanel()};
+	public static JPanel[] connectPanels = {new JPanel(), new JPanel(), new JPanel(), new JPanel(), new JPanel(), new JPanel()};
 	public static JButton connectBtn = new JButton();
 	public static JTextField ipInput = new JTextField();
 	public static JTextField portInput = new JTextField();	
@@ -40,11 +42,13 @@ public class MultiplayerWindow extends JFrame {
 	public static JButton unreadyBtn = new JButton();
 	public static JLabel nameLbl = new JLabel();
 	public static JTextField nameInput = new JTextField();
+	public static JTextField chatbox = new JTextField();
+	public static boolean connected = false;
 	
 	public MultiplayerWindow() {
 		this.setDefaultCloseOperation(WindowConstants.HIDE_ON_CLOSE);
 		this.setTitle("Multiplayer");
-		this.setSize(300, 415);
+		this.setSize(300, 460);
 		this.setResizable(false);
 		this.setLocationRelativeTo(null);
 		this.setVisible(false);
@@ -59,7 +63,9 @@ public class MultiplayerWindow extends JFrame {
 		portInput.setPreferredSize(new Dimension(60, 25));
 		nameInput.setPreferredSize(new Dimension(90, 25));
 		console.setPreferredSize(new Dimension(250, 200));
+		chatbox.setPreferredSize(new Dimension(250, 30));
 		
+		chatbox.setToolTipText("I am a chatbox, type in me and hit enter to chat");
 		nameInput.setToolTipText("Your Name");
 		ipInput.setToolTipText("IP Address of Server");
 		portInput.setToolTipText("Port of Server");
@@ -78,6 +84,7 @@ public class MultiplayerWindow extends JFrame {
 		this.add(connectPanels[2]);	
 		this.add(connectPanels[3]);
 		this.add(connectPanels[4]);
+		this.add(connectPanels[5]);
 		
 		connectPanels[0].add(connectLbl);
 		connectPanels[1].add(ipInput);
@@ -87,14 +94,16 @@ public class MultiplayerWindow extends JFrame {
 		connectPanels[2].add(connectBtn);
 		connectPanels[3].add(readyBtn);
 		connectPanels[3].add(unreadyBtn);
-		connectPanels[4].add(console);
 		connectPanels[4].add(scroll);
+		connectPanels[5].add(chatbox);
 		
 		console.setEditable(false);
+		chatbox.setEditable(true);
 		
 		connectLbl.setText("Enter IP and Port of Server");
 		connectBtn.setText("Connect");
 		
+		chatbox.addKeyListener(new Typed());
 		readyBtn.addActionListener(new Clicked());
 		unreadyBtn.addActionListener(new Clicked());
 		connectBtn.addActionListener(new Clicked());
@@ -131,8 +140,8 @@ public class MultiplayerWindow extends JFrame {
 			
 			readyBtn.setEnabled(true);
 			
+			connected = true;
 			sendMessageToServer("NAME_REPORT "+name);
-			
 			System.out.println("Connected. Client address : "+address);
 		}
 		catch (IOException e){
@@ -160,6 +169,29 @@ public class MultiplayerWindow extends JFrame {
 	 */
 	public static void setMultiplayerGame(boolean state) {
 		on = state;
+	}
+	
+	private class Typed implements KeyListener {
+
+		@Override
+		public void keyPressed(KeyEvent arg0) {
+			
+		}
+
+		@Override
+		public void keyReleased(KeyEvent arg0) {
+			
+		}
+
+		@Override
+		public void keyTyped(KeyEvent arg0) {
+				
+			if(connected && arg0.getKeyChar()=='\n' && chatbox.getText().length()>0) {
+				sendMessageToServer("CHAT " + chatbox.getText());
+				chatbox.setText("");
+			}
+		}
+		
 	}
 	
 	private class Clicked implements ActionListener {

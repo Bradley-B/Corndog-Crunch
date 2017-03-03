@@ -38,7 +38,7 @@ public class ServerController extends Thread {
 				timeRemaining = 10;
 				collectScoresFromClients();
 				
-				String finalScoreString = "MP_SCORE_REPORT ";
+				String finalScoreString = "MP_SCORE_REPORT \n";
 				for(Score s : scores) {
 					finalScoreString = finalScoreString+s.getName()+": "+s.getScore()+"\n";
 				}

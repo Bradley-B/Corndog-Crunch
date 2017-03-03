@@ -46,6 +46,9 @@ public class ServerClientInputManager extends Thread{
 		} else if(command.contains("NAME_REPORT")) {
 			String name = command.substring(11, command.length());
 			cm.setPlayerName(name.trim());
+		} else if(command.contains("CHAT")) {
+			String message = command.substring(4, command.length());
+			Server.sc.sendMessageToClients(cm.name+": "+message);
 		}
 	}
 	
@@ -56,7 +59,7 @@ public class ServerClientInputManager extends Thread{
 				
 				input = in.readLine(); //thread hangs on this line until new line is found on stream
 				
-				System.out.println("Command recieved from " + socket.getInetAddress() + " : " + input);
+				System.out.println("Command recieved from " + findMaster().name + " : " + input);
 	
 				processCommand(input);
 				
@@ -65,7 +68,6 @@ public class ServerClientInputManager extends Thread{
 		} catch(IOException e) {
 			System.out.println("error in reading CIM... closing respective socket");
 			ServerClientManager thisCm = findMaster();
-			Server.sa.threads.remove(thisCm);
 			thisCm.closeConnection();
 		}
 	}
