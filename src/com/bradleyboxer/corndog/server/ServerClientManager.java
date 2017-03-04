@@ -59,7 +59,7 @@ class ServerClientManager extends Thread{
 		try{
 			System.out.println("Connection closing...");
 			
-			Server.sa.threads.remove(this);
+			Server.sa.removeClient(this);
 			
 			if (cim.in!=null){
 				cim.in.close(); 

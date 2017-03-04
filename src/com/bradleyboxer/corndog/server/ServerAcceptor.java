@@ -7,14 +7,22 @@ import java.util.ArrayList;
 
 public class ServerAcceptor extends Thread{
 
-	public ArrayList<ServerClientManager> threads = new ArrayList<ServerClientManager>();
+	private ArrayList<ServerClientManager> threads = new ArrayList<ServerClientManager>();
 	int port;
 	
 	public ServerAcceptor(int port) {
 		this.port = port;
 	}
 	
-	public ArrayList<ServerClientManager> getClients() {
+	public synchronized void removeClient(ServerClientManager cm) {
+		threads.remove(cm);
+	}
+	
+	public synchronized void addClient(ServerClientManager cm) {
+		threads.add(cm);
+	}
+	
+	public synchronized ArrayList<ServerClientManager> getClients() {
 		return threads;
 	}
 	
@@ -34,11 +42,11 @@ public class ServerAcceptor extends Thread{
 				socket = serverSocket.accept();
 				
 				System.out.println("Connection established with " + socket.getRemoteSocketAddress() + " . Opening in new thread.");
-				ServerClientManager connectionToClient = new ServerClientManager(socket);
-				threads.add(connectionToClient);
+				ServerClientManager connectionToClient = new ServerClientManager(socket);	
+				addClient(connectionToClient);
 				connectionToClient.start();
 				
-				try{Thread.sleep(1);} catch(InterruptedException e) {}
+				try{Thread.sleep(10);} catch(InterruptedException e) {}
 				
 			} catch(Exception e){
 				e.printStackTrace();

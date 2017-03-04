@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
-public class ServerClientInputManager extends Thread{
+public class ServerClientInputManager extends Thread {
 
 	BufferedReader in = null;
 	String input = null;
