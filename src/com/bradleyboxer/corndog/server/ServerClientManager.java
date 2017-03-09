@@ -57,7 +57,7 @@ class ServerClientManager extends Thread{
 
 	public void closeConnection() {
 		try{
-			System.out.println("Connection closing...");
+			System.out.println("Connection closing for "+name+"...");
 			
 			Server.sa.removeClient(this);
 			
@@ -74,6 +74,8 @@ class ServerClientManager extends Thread{
 				System.out.println("Socket closed");
 			}
 
+			Server.sc.sendMessageToClients(name+" has disconnected!");
+			
 		}
 		catch(IOException ie){
 			System.out.println("Socket close error!");

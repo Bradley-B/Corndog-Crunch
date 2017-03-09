@@ -97,6 +97,8 @@ public class MultiplayerWindow extends JFrame {
 		connectPanels[4].add(scroll);
 		connectPanels[5].add(chatbox);
 		
+		console.setLineWrap(true);
+		
 		console.setEditable(false);
 		chatbox.setEditable(true);
 		

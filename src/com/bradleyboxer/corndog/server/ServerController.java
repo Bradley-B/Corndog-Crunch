@@ -67,15 +67,15 @@ public class ServerController extends Thread {
 	}
 
 	
-	public boolean getAllReady() {
+	public boolean getAllReady() { //check the state of all clients to see if they are ready
 		ArrayList<ServerClientManager> clients = Server.sa.getClients();
 	
 		if(clients.size()==0) {
 			return false;
 		}
 	
-		for(ServerClientManager cm : clients) {
-			if(!cm.getReadyState() || gameRunning) { //returns true if not ready or game running
+		for(ServerClientManager cm : clients) { //check clients. If one is not ready, return false  
+			if(cm!=null && (!cm.getReadyState() || gameRunning)) { //returns true if not ready or game running
 				return false;
 			}
 		}

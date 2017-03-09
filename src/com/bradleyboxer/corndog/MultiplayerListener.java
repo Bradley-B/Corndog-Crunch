@@ -44,7 +44,7 @@ public class MultiplayerListener extends Thread{
 				textProgress = 0;
 			} else {
 				MultiplayerWindow.console.setText(MultiplayerWindow.console.getText()+"\n"+command);
-				textProgress++;
+				textProgress+=(int) (command.length()/36)+1;
 			}
 		}
 	}
