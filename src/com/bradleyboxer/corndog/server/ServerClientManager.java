@@ -13,7 +13,7 @@ class ServerClientManager extends Thread{
 	PrintWriter out = null;
 	Socket socket = null;
 	ServerClientInputManager cim = null;
-	String name = "default.name";
+	String name = "new.player";
 	int score = 0;
 	
 	public ServerClientManager(Socket socket){
@@ -51,7 +51,7 @@ class ServerClientManager extends Thread{
 	
 	public void sendMessage(String message) {
 		out.println(message);
-		System.out.println("Responded with : " + message);
+		System.out.println("Responded to client with : " + message);
 		out.flush();
 	}
 

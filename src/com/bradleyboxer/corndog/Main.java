@@ -182,7 +182,7 @@ public class Main extends JFrame {
 		try {
 			if(!MultiplayerWindow.socket1.isClosed()) {
 				MultiplayerWindow.setMultiplayerGame(false);
-				MultiplayerWindow.sendMessageToServer("SCORE_REPORT "+score+"  ");
+				MultiplayerWindow.sendMessageToServer("/scoreReport "+score);
 			}
 		} catch(NullPointerException e) {}
 		

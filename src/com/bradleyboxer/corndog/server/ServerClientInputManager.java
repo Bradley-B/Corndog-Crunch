@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 
+import com.bradleyboxer.corndog.Misc;
+
 public class ServerClientInputManager extends Thread {
 
 	BufferedReader in = null;
@@ -34,22 +36,36 @@ public class ServerClientInputManager extends Thread {
 	public void processCommand(String command) {
 		ServerClientManager cm = findMaster();
 		
-		if(command.compareTo("ready")==0) {
-			cm.setReady();
-			Server.sc.sendMessageToClients(cm.name+" readied!");
-		} else if(command.compareTo("unready")==0) {
-			cm.setUnready();
-			Server.sc.sendMessageToClients(cm.name+" unreadied!");
-		} else if(command.contains("SCORE_REPORT")) {
-			String sscore = command.substring(12, 15);
-			cm.setScore(Integer.valueOf(sscore.trim()));
-		} else if(command.contains("NAME_REPORT")) {
-			String name = command.substring(11, command.length());
-			cm.setPlayerName(name.trim());
-		} else if(command.contains("CHAT")) {
-			String message = command.substring(4, command.length());
-			Server.sc.sendMessageToClients(cm.name+": "+message);
+		if(command.startsWith("/")) {
+			String basecommand = Misc.getCommand(command);
+			String subcommand = Misc.getSubcommand(command);
+			
+			//System.out.println("basecommand = "+basecommand);
+			
+			if(basecommand.equals("ready")) { //add commands here
+				cm.setReady();
+				Server.sc.sendMessageToClients(cm.name+" readied!");
+			} else if(basecommand.equals("unready")) {
+				cm.setUnready();
+				Server.sc.sendMessageToClients(cm.name+" unreadied!");
+			} else if(basecommand.contains("scoreReport")) {
+				String sscore = subcommand.trim();
+				cm.setScore(Integer.valueOf(sscore));
+			} else if(basecommand.equals("nameReport")) {
+				cm.setPlayerName(subcommand);
+			} else if(basecommand.equals("disconnect")) {
+				cm.closeConnection();
+			} else if(basecommand.equals("start")) {
+				Runnable newSc = () -> {Server.sc.runGame();};
+				new Thread(newSc).start();
+			} else {
+				cm.sendMessage("command not found");
+			}
+			
+		} else {
+			Server.sc.sendMessageToClients(cm.name+": "+command);
 		}
+		
 	}
 	
 	public void run() {

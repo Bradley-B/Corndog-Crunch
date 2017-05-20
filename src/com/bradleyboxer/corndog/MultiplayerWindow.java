@@ -12,6 +12,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.regex.Pattern;
 
 import javax.swing.JButton;
@@ -22,6 +23,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.WindowConstants;
+
+import com.bradleyboxer.corndog.server.Server;
 
 public class MultiplayerWindow extends JFrame {
 	private static final long serialVersionUID = 1L;
@@ -129,28 +132,25 @@ public class MultiplayerWindow extends JFrame {
 	}
 	
 	public static void connectToServer(String ip, String name, int port) throws IOException {
-		address=InetAddress.getByName(ip);
-		
 		try {
-			socket1=new Socket(address, port); 
-			br= new BufferedReader(new InputStreamReader(System.in));
-			
-			out= new PrintWriter(socket1.getOutputStream());
-			
-			listener = new MultiplayerListener(socket1);
-			listener.start();
-			
-			readyBtn.setEnabled(true);
-			
-			connected = true;
-			sendMessageToServer("NAME_REPORT "+name);
-			System.out.println("Connected. Client address : "+address);
+			address=InetAddress.getByName(ip);
+		} catch (UnknownHostException e1) {
+			e1.printStackTrace();
 		}
-		catch (IOException e){
-			//e.printStackTrace();
-			System.out.println("IO exception in client. This is probably not the server's fault.");
-			System.out.println(e.getMessage());
-		}
+
+		socket1=new Socket(address, port); 
+		br= new BufferedReader(new InputStreamReader(System.in));
+
+		out= new PrintWriter(socket1.getOutputStream());
+
+		listener = new MultiplayerListener(socket1);
+		listener.start();
+
+		readyBtn.setEnabled(true);
+
+		connected = true;
+		sendMessageToServer("/nameReport "+name);
+		System.out.println("Connected. Client address : "+address);
 
 	}
 
@@ -162,7 +162,7 @@ public class MultiplayerWindow extends JFrame {
 	public static void setUnready() {
 		readyBtn.setEnabled(true);
 		unreadyBtn.setEnabled(false);
-		sendMessageToServer("unready");
+		sendMessageToServer("/unready");
 	}
 	
 	/**
@@ -187,13 +187,25 @@ public class MultiplayerWindow extends JFrame {
 
 		@Override
 		public void keyTyped(KeyEvent arg0) {
-				
+
 			if(connected && arg0.getKeyChar()=='\n' && chatbox.getText().length()>0) {
-				sendMessageToServer("CHAT " + chatbox.getText());
+				String command = chatbox.getText();
+				String basecommand = Misc.getCommand(command);
+				String subcommand = Misc.getSubcommand(command);
+
+				if(basecommand.contains("disconnect")) { //add else if statements for clientside commands here
+					connected = false;
+					sendMessageToServer(command);
+					listener.closeConnection();
+					connectBtn.setEnabled(true);
+					readyBtn.setEnabled(false);
+					unreadyBtn.setEnabled(false);
+				} else {
+					sendMessageToServer(command);
+				}
 				chatbox.setText("");
 			}
 		}
-		
 	}
 	
 	private class Clicked implements ActionListener {
@@ -208,16 +220,18 @@ public class MultiplayerWindow extends JFrame {
 						connectToServer(uIp, uName, Integer.decode(uPort));
 						connectBtn.setEnabled(false);
 					} catch (IOException ex) {
-						ex.printStackTrace();
+						//System.out.println("IO exception in client. This is probably not the server's fault.");
+						System.out.println(ex.getMessage());
+						console.setText("Connection failed.\nCheck the IP address and try again.\n"+ex.getMessage());
 					}
 				} else {
-					System.out.println("Preference values are incorrect. Please correct any errors and try again.");
-				}
+					console.setText("Preference values are incorrect.\nPlease correct any errors and try again.");
+				} 
 				
 			} else if(e.getSource()==readyBtn) {
 				readyBtn.setEnabled(false);
 				unreadyBtn.setEnabled(true);
-				sendMessageToServer("ready");
+				sendMessageToServer("/ready");
 			}else if(e.getSource()==unreadyBtn) {
 				setUnready();
 			}

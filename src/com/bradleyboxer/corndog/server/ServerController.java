@@ -26,27 +26,33 @@ public class ServerController extends Thread {
 		}
 	}
 	
+	public void runGame() {
+		sendMessageToClients("start");
+		sendMessageToClients("Started!");
+		gameRunning = true;
+		try {Thread.sleep(9000);} catch(InterruptedException e) {};
+		gameRunning = false;
+		timeRemaining = 10;
+		collectScoresFromClients();
+		
+		sendMessageToClients("clear");
+		
+		String finalScoreString = "";
+		for(Score s : scores) {
+			finalScoreString = finalScoreString+s.getName()+": "+s.getScore()+"\n";
+		}
+		
+		System.out.println("--------------SCORES REPORT-------------");
+		System.out.println("Scores counted! Results: \n"+finalScoreString);
+		sendMessageToClients(finalScoreString);
+		scores.clear();
+	
+	}
+	
 	public void runCountdown() {
 		try {
-			
 			if(timeRemaining==0) {
-				sendMessageToClients("start");
-				sendMessageToClients("Started!");
-				gameRunning = true;
-				Thread.sleep(9000);
-				gameRunning = false;
-				timeRemaining = 10;
-				collectScoresFromClients();
-				
-				String finalScoreString = "MP_SCORE_REPORT \n";
-				for(Score s : scores) {
-					finalScoreString = finalScoreString+s.getName()+": "+s.getScore()+"\n";
-				}
-				
-				System.out.println("Scores counted! Results: \n"+finalScoreString);
-				sendMessageToClients(finalScoreString);
-				scores.clear();
-				
+				runGame();
 			} else {
 				timeRemaining--;
 				sendMessageToClients("Starting in "+String.valueOf(timeRemaining) + " seconds");

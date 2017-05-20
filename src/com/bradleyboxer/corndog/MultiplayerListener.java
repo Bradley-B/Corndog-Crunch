@@ -24,20 +24,27 @@ public class MultiplayerListener extends Thread{
 		while(!socket.isClosed()) {
 			try {
 				line = in.readLine();
-				processCommand(line);
+				if(MultiplayerWindow.connected) {
+					processCommand(line);
+				}
 			} catch (IOException e) {}
 		}
 	}
 	
 	public void processCommand(String command) {
-		if(command.compareTo("start")==0) {
+		String basecommand = Misc.getCommand(command);
+		String subcommand = Misc.getSubcommand(command);
+		
+		if(basecommand.equals("start")) {
 			Main.initialTime = System.currentTimeMillis();
 			Main.placeNewCreature();
 			MultiplayerWindow.setMultiplayerGame(true);
 			MultiplayerWindow.setUnready();
-		} else if(command.contains("MP_SCORE_REPORT")) {
-			MultiplayerWindow.console.setText("\n"+command.substring(15,command.length()).trim());
+		} else if(basecommand.contains("multiplayerScoreReport")) {
+			MultiplayerWindow.console.setText("\n"+subcommand.trim());
 			textProgress = 10;
+		} else if(basecommand.contains("clear")) {
+			MultiplayerWindow.console.setText("");
 		} else {
 			if(textProgress>=10) {
 				MultiplayerWindow.console.setText(command);
@@ -48,4 +55,17 @@ public class MultiplayerListener extends Thread{
 			}
 		}
 	}
+	
+	public void closeConnection() {
+		try {
+			in.close();
+			socket.close();
+			line = "";
+			textProgress = 0;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
 }
