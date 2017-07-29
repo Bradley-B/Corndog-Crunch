@@ -36,6 +36,10 @@ public class ServerClientInputManager extends Thread {
 	public void processCommand(String command) {
 		ServerClientManager cm = findMaster();
 		
+		if(command==null) {
+			cm.closeConnection();
+		}
+		
 		if(command.startsWith("/")) {
 			String basecommand = Misc.getCommand(command);
 			String subcommand = Misc.getSubcommand(command);

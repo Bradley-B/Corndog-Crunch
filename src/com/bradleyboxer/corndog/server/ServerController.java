@@ -30,7 +30,7 @@ public class ServerController extends Thread {
 		sendMessageToClients("start");
 		sendMessageToClients("Started!");
 		gameRunning = true;
-		try {Thread.sleep(9000);} catch(InterruptedException e) {};
+		try {Thread.sleep(12000);} catch(InterruptedException e) {}; //9000
 		gameRunning = false;
 		timeRemaining = 10;
 		collectScoresFromClients();
